@@ -1,0 +1,10 @@
+version: "3"
+services:
+
+  chrome:
+    image: selenium/standalone-chrome-debug
+    ports:
+      - "32780:4444"
+      - "32779:5900"
+    volumes:
+      - /dev/shm:/dev/shm
