@@ -1,5 +1,6 @@
 const merge = require('deepmerge')
 const {config} = require('./wdio.conf');
+const { exec } = require('child_process');
 
 const port = 32780;
 const image = 'selenium/standalone-chrome-debug';
@@ -16,5 +17,22 @@ exports.config = merge(config, {
             P: true,
             v: [`/dev/shm:/dev/shm ${image}`],
         }
+    },
+    onPrepare: function (config, capabilities) {
+        try {
+        exec('npm run start-hub-dev', (error, stdout, stderr) => {
+            if (error) {
+                console.log(`error: ${error.message}`);
+                return;
+            }
+            if (stderr) {
+                console.log(`stderr: ${stderr}`);
+                return;
+            }
+            console.log(`stdout: ${stdout}`);
+        });
+    } catch (error) {
+            console.log(error);
     }
+    },
 })

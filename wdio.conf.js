@@ -1,5 +1,6 @@
 const addContext = require('mochawesome/addContext');
 const { exec } = require('child_process');
+const {scaleTest} = require('./lib/scaleTest');
 
 exports.config = {
     //
@@ -43,7 +44,7 @@ exports.config = {
     // and 30 processes will get spawned. The property handles how many capabilities
     // from the same test should run tests.
     //
-    maxInstances: 2,
+    maxInstances: 1,
     //
     // If you have trouble getting all important capabilities together, check out the
     // Sauce Labs platform configurator - a great tool to configure your capabilities:
@@ -122,7 +123,6 @@ exports.config = {
             d: true,
             net: true,
             p: ['32772:5900'],
-            P: true,
             shmSize: '2g',
             e: ['START_XVFB=false'],
             v: ['/dev/shm:/dev/shm selenium/node-chrome'],
@@ -176,19 +176,25 @@ exports.config = {
      * @param {Object} config wdio configuration object
      * @param {Array.<Object>} capabilities list of capabilities details
      */
-    // onPrepare: function (config, capabilities) {
-    //     let reportAggregator = new ReportAggregator({
-    //         outputDir: './reports/html-reports/',
-    //         filename: 'master-report.html',
-    //         reportTitle: 'Master Report',
-    //         browserName : browser.capabilities.browserName,
-    //         // to use the template override option, can point to your own file in the test project:
-    //         // templateFilename: path.resolve(__dirname, '../template/wdio-html-reporter-alt-template.hbs')
-    //     });
-    //     reportAggregator.clean() ;
-
-    //     global.reportAggregator = reportAggregator;
-    // },
+    onPrepare: function (config, capabilities) {
+        let scale;
+        try {
+            scale = scaleTest(capabilities, config, 'docker-compose.yml');
+        } catch (error) {
+            console.log(error.message);
+        }
+        exec(`npm run start-hub -- --scale ${scale}`, (error, stdout, stderr) => {
+            if (error) {
+                console.log(`error: ${error}`);
+                return;
+            }
+            if (stderr) {
+                console.log(`stderr: ${stderr}`);
+                return;
+            }
+            console.log(`stdout: ${stdout}`);
+        });
+    },
     /**
      * Gets executed before a worker process is spawned and can be used to initialise specific service
      * for that worker as well as modify runtime environments in an async fashion.
@@ -318,3 +324,4 @@ exports.config = {
     //onReload: function(oldSessionId, newSessionId) {
     //}
 }
+

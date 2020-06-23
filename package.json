@@ -5,16 +5,18 @@
   "main": "index.js",
   "scripts": {
     "start-hub": "docker-compose down && docker-compose up -d",
-    "start-hub-debug": "docker-compose down && docker-compose -f docker-compose-debug.yml up -d",
-    "test": "npm run start-hub && wdio wdio.conf.js",
-    "test-debug": "npm run start-hub-debug && wdio run wdio.conf.debug.js",
+    "start-hub-dev": "docker-compose down && docker-compose -f docker-compose-dev.yml up -d",
+    "test": "wdio wdio.conf.js",
+    "test-dev": "wdio run wdio.dev.conf.js",
     "generateMochawesome": "node mergeResults.js && marge Results/wdio-ma-merged.json --reportTitle 'My Project Results'",
     "report-cleanup": "rm -rf Results mochawesome-report reports/html-reports/screenshots/*"
   },
   "keywords": [],
   "author": "Tejas Deshpande",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "js-yaml": "^3.13.1"
+  },
   "devDependencies": {
     "@rpii/wdio-html-reporter": "~1.0.0",
     "@wdio/cli": "^6.1.4",
